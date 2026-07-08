@@ -2,7 +2,10 @@ import { db } from "./firebase.js";
 
 import {
     collection,
-    onSnapshot
+    onSnapshot,
+    updateDoc,
+    doc,
+    arrayUnion
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 
@@ -16,11 +19,12 @@ onSnapshot(tripRef,(snapshot)=>{
 
     tripDiv.innerHTML="";
 
-    snapshot.forEach((doc)=>{
 
-        const day = doc.data();
+    snapshot.forEach((document)=>{
 
-        console.log(day);
+        const day = document.data();
+
+        const dayId = document.id;
 
 
         tripDiv.innerHTML += `
@@ -28,6 +32,7 @@ onSnapshot(tripRef,(snapshot)=>{
         <div class="day">
 
             <h2>${day.title}</h2>
+
 
             ${(day.activities || []).map(activity=>`
 
@@ -37,6 +42,12 @@ onSnapshot(tripRef,(snapshot)=>{
 
             `).join("")}
 
+
+            <button onclick="addActivity('${dayId}')">
+                + Add Activity
+            </button>
+
+
         </div>
 
         `;
@@ -44,3 +55,21 @@ onSnapshot(tripRef,(snapshot)=>{
     });
 
 });
+
+
+
+window.addActivity = async function(dayId){
+
+    const activity = prompt("New activity:");
+
+    if(!activity) return;
+
+
+    await updateDoc(
+        doc(db,"itinerary",dayId),
+        {
+            activities: arrayUnion(activity)
+        }
+    );
+
+};
