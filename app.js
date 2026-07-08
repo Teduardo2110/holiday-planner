@@ -27,7 +27,7 @@ onSnapshot(tripRef,(snapshot)=>{
 
             <h2>${day.title}</h2>
 
-            ${day.activities.map(activity=>`
+            ${(day.activities || []).map(activity=>`
 
                 <div class="activity">
                     ${activity}
