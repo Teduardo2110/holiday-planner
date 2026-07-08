@@ -20,6 +20,8 @@ onSnapshot(tripRef,(snapshot)=>{
 
         const day = doc.data();
 
+        console.log(day);
+
 
         tripDiv.innerHTML += `
 
