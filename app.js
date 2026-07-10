@@ -6,7 +6,9 @@ import {
     doc,
     getDoc,
     query,
-    orderBy
+    orderBy,
+    updateDoc,
+    arrayUnion
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 
@@ -175,10 +177,25 @@ async function showTrip(tripId){
                 ${(day.activities || []).map(activity=>`
 
                     <div class="activity">
-                        ✦ ${activity}
+
+                        <div class="time">
+                            ${activity.time}
+                        </div>
+
+                        <div class="activity-text">
+
+                            ${activity.icon ? activity.icon + " " : ""}
+                            ${activity.title}
+
+                        </div>
+
                     </div>
 
                 `).join("")}
+
+                <button onclick="addActivity('${tripId}','${dayDoc.id}')">
+                    + Add Activity
+                </button>
 
 
             </div>
@@ -193,3 +210,51 @@ async function showTrip(tripId){
 
 
 }
+
+
+window.addActivity = async function(tripId, dayId){
+
+
+    const time = prompt("Time (e.g. 19:30):");
+
+
+    if(!time) return;
+
+
+
+    const title = prompt("Activity:");
+
+    if(!title) return;
+
+
+
+    const activity = {
+
+        time: time,
+
+        title: title
+
+    };
+
+
+
+    await updateDoc(
+
+        doc(
+            db,
+            "trips",
+            tripId,
+            "days",
+            dayId
+        ),
+
+        {
+
+            activities: arrayUnion(activity)
+
+        }
+
+    );
+
+
+};

@@ -164,3 +164,35 @@ button {
     cursor:pointer;
 
 }
+
+.activity {
+
+    display:flex;
+
+    gap:20px;
+
+    align-items:center;
+
+    padding:15px 0;
+
+    border-bottom:1px dashed #ddd;
+
+}
+
+
+.time {
+
+    font-weight:bold;
+
+    color:#d97b5f;
+
+    min-width:60px;
+
+}
+
+
+.activity-text {
+
+    font-size:1.1rem;
+
+}
