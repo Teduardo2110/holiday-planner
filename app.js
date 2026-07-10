@@ -2,7 +2,11 @@ import { db } from "./firebase.js";
 
 import {
     collection,
-    onSnapshot
+    onSnapshot,
+    doc,
+    getDoc,
+    query,
+    orderBy
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 
@@ -31,41 +35,111 @@ if (!selectedTrip) {
 
 
 
-function showTrips() {
+async function showTrip(tripId){
 
 
-    const tripsRef = collection(db,"trips");
+    tripDiv.innerHTML = `
+        <h2>Loading trip...</h2>
+    `;
 
 
-    onSnapshot(tripsRef,(snapshot)=>{
+    // Load trip information
+
+    const tripDoc = await getDoc(
+        doc(db,"trips",tripId)
+    );
 
 
-        tripDiv.innerHTML = "";
+    if(!tripDoc.exists()){
+
+        tripDiv.innerHTML = `
+            <h2>Trip not found</h2>
+        `;
+
+        return;
+    }
 
 
-        snapshot.forEach((document)=>{
+    const trip = tripDoc.data();
 
 
-            const trip = document.data();
 
-            const tripId = document.id;
+    tripDiv.innerHTML = `
+
+        <div class="day">
+
+            <h2>${trip.title}</h2>
+
+            <p>
+            ${trip.description || ""}
+            </p>
+
+            <button onclick="window.location.href='?'">
+                ← Back to Trips
+            </button>
+
+        </div>
 
 
-            tripDiv.innerHTML += `
+        <div id="days"></div>
+
+    `;
+
+
+
+    const daysDiv = document.getElementById("days");
+
+
+
+    const daysRef = collection(
+        db,
+        "trips",
+        tripId,
+        "days"
+    );
+
+
+    const daysQuery = query(
+        daysRef,
+        orderBy("order")
+    );
+
+
+
+    onSnapshot(daysQuery,(snapshot)=>{
+
+
+        daysDiv.innerHTML="";
+
+
+        snapshot.forEach((dayDoc)=>{
+
+
+            const day = dayDoc.data();
+
+
+
+            daysDiv.innerHTML += `
 
             <div class="day">
 
-                <h2>${trip.title}</h2>
 
-                <p>${trip.description || ""}</p>
+                <h2>
+                    ${day.title}
+                </h2>
 
 
-                <button onclick="openTrip('${tripId}')">
-                    Open Trip →
-                </button>
+                ${(day.activities || []).map(activity=>`
+
+                    <div class="activity">
+                        ✦ ${activity}
+                    </div>
+
+                `).join("")}
 
 
             </div>
+
 
             `;
 
