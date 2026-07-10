@@ -13,24 +13,79 @@ import {
 const tripDiv = document.getElementById("trip");
 
 
-// Check URL for selected trip
-
 const params = new URLSearchParams(window.location.search);
 
 const selectedTrip = params.get("trip");
 
 
-// If no trip selected, show trip list
-
-if (!selectedTrip) {
-
-    showTrips();
-
-} else {
+if (selectedTrip) {
 
     showTrip(selectedTrip);
 
+} else {
+
+    showTrips();
+
 }
+
+
+
+
+function showTrips() {
+
+
+    const tripsRef = collection(db,"trips");
+
+
+    onSnapshot(tripsRef,(snapshot)=>{
+
+
+        tripDiv.innerHTML = "";
+
+
+        snapshot.forEach((document)=>{
+
+
+            const trip = document.data();
+
+
+            tripDiv.innerHTML += `
+
+            <div class="day">
+
+                <h2>${trip.title}</h2>
+
+                <p>
+                    ${trip.description || ""}
+                </p>
+
+                <button onclick="openTrip('${document.id}')">
+                    Open Trip →
+                </button>
+
+            </div>
+
+            `;
+
+
+        });
+
+
+    });
+
+}
+
+
+
+window.openTrip = function(tripId){
+
+
+    window.location.href =
+    `?trip=${tripId}`;
+
+
+};
+
 
 
 
@@ -38,29 +93,24 @@ if (!selectedTrip) {
 async function showTrip(tripId){
 
 
-    tripDiv.innerHTML = `
-        <h2>Loading trip...</h2>
-    `;
+    tripDiv.innerHTML = "Loading trip...";
 
 
-    // Load trip information
-
-    const tripDoc = await getDoc(
+    const tripSnap = await getDoc(
         doc(db,"trips",tripId)
     );
 
 
-    if(!tripDoc.exists()){
+    if(!tripSnap.exists()){
 
-        tripDiv.innerHTML = `
-            <h2>Trip not found</h2>
-        `;
+        tripDiv.innerHTML="Trip not found";
 
         return;
+
     }
 
 
-    const trip = tripDoc.data();
+    const trip = tripSnap.data();
 
 
 
@@ -70,16 +120,13 @@ async function showTrip(tripId){
 
             <h2>${trip.title}</h2>
 
-            <p>
-            ${trip.description || ""}
-            </p>
+            <p>${trip.description || ""}</p>
 
             <button onclick="window.location.href='?'">
                 ← Back to Trips
             </button>
 
         </div>
-
 
         <div id="days"></div>
 
@@ -88,7 +135,6 @@ async function showTrip(tripId){
 
 
     const daysDiv = document.getElementById("days");
-
 
 
     const daysRef = collection(
@@ -123,10 +169,7 @@ async function showTrip(tripId){
 
             <div class="day">
 
-
-                <h2>
-                    ${day.title}
-                </h2>
+                <h2>${day.title}</h2>
 
 
                 ${(day.activities || []).map(activity=>`
@@ -140,7 +183,6 @@ async function showTrip(tripId){
 
             </div>
 
-
             `;
 
 
@@ -148,53 +190,6 @@ async function showTrip(tripId){
 
 
     });
-
-
-}
-
-
-
-
-window.openTrip = function(tripId){
-
-
-    window.location.href =
-    `?trip=${tripId}`;
-
-
-};
-
-
-
-
-
-function showTrip(tripId){
-
-
-    tripDiv.innerHTML = `
-
-    <h2>Loading trip...</h2>
-
-    `;
-
-
-    // Temporary message for now
-
-    tripDiv.innerHTML = `
-
-    <div class="day">
-
-        <h2>${tripId}</h2>
-
-        <p>Trip loading will be added next 🚀</p>
-
-        <button onclick="window.location.href='?'">
-            ← Back to Trips
-        </button>
-
-    </div>
-
-    `;
 
 
 }
