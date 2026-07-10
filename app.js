@@ -9,54 +9,75 @@ import {
 const tripDiv = document.getElementById("trip");
 
 
-const tripsRef = collection(db,"trips");
+// Check URL for selected trip
+
+const params = new URLSearchParams(window.location.search);
+
+const selectedTrip = params.get("trip");
+
+
+// If no trip selected, show trip list
+
+if (!selectedTrip) {
+
+    showTrips();
+
+} else {
+
+    showTrip(selectedTrip);
+
+}
 
 
 
-onSnapshot(tripsRef,(snapshot)=>{
+
+function showTrips() {
 
 
-    tripDiv.innerHTML = "";
+    const tripsRef = collection(db,"trips");
 
 
-    snapshot.forEach((document)=>{
+    onSnapshot(tripsRef,(snapshot)=>{
 
 
-        const trip = document.data();
-
-        const tripId = document.id;
+        tripDiv.innerHTML = "";
 
 
-
-        tripDiv.innerHTML += `
-
-
-        <div class="day">
+        snapshot.forEach((document)=>{
 
 
-            <h2>${trip.title}</h2>
+            const trip = document.data();
+
+            const tripId = document.id;
 
 
-            <p>
-                ${trip.description || ""}
-            </p>
+            tripDiv.innerHTML += `
+
+            <div class="day">
+
+                <h2>${trip.title}</h2>
+
+                <p>${trip.description || ""}</p>
 
 
-            <button onclick="openTrip('${tripId}')">
-                Open Trip →
-            </button>
+                <button onclick="openTrip('${tripId}')">
+                    Open Trip →
+                </button>
 
 
-        </div>
+            </div>
+
+            `;
 
 
-        `;
+        });
 
 
     });
 
 
-});
+}
+
 
 
 
@@ -68,3 +89,38 @@ window.openTrip = function(tripId){
 
 
 };
+
+
+
+
+
+function showTrip(tripId){
+
+
+    tripDiv.innerHTML = `
+
+    <h2>Loading trip...</h2>
+
+    `;
+
+
+    // Temporary message for now
+
+    tripDiv.innerHTML = `
+
+    <div class="day">
+
+        <h2>${tripId}</h2>
+
+        <p>Trip loading will be added next 🚀</p>
+
+        <button onclick="window.location.href='?'">
+            ← Back to Trips
+        </button>
+
+    </div>
+
+    `;
+
+
+}
