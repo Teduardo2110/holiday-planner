@@ -2,74 +2,69 @@ import { db } from "./firebase.js";
 
 import {
     collection,
-    onSnapshot,
-    updateDoc,
-    doc,
-    arrayUnion
+    onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 
 const tripDiv = document.getElementById("trip");
 
 
-const tripRef = collection(db,"itinerary");
+const tripsRef = collection(db,"trips");
 
 
-onSnapshot(tripRef,(snapshot)=>{
 
-    tripDiv.innerHTML="";
+onSnapshot(tripsRef,(snapshot)=>{
+
+
+    tripDiv.innerHTML = "";
 
 
     snapshot.forEach((document)=>{
 
-        const day = document.data();
 
-        const dayId = document.id;
+        const trip = document.data();
+
+        const tripId = document.id;
+
 
 
         tripDiv.innerHTML += `
 
+
         <div class="day">
 
-            <h2>${day.title}</h2>
+
+            <h2>${trip.title}</h2>
 
 
-            ${(day.activities || []).map(activity=>`
-
-                <div class="activity">
-                    ${activity}
-                </div>
-
-            `).join("")}
+            <p>
+                ${trip.description || ""}
+            </p>
 
 
-            <button onclick="addActivity('${dayId}')">
-                + Add Activity
+            <button onclick="openTrip('${tripId}')">
+                Open Trip →
             </button>
 
 
         </div>
 
+
         `;
 
+
     });
+
 
 });
 
 
 
-window.addActivity = async function(dayId){
-
-    const activity = prompt("New activity:");
-
-    if(!activity) return;
+window.openTrip = function(tripId){
 
 
-    await updateDoc(
-        doc(db,"itinerary",dayId),
-        {
-            activities: arrayUnion(activity)
-        }
-    );
+    window.location.href =
+    `?trip=${tripId}`;
+
 
 };

@@ -138,3 +138,29 @@ button:hover {
     }
 
 }
+
+
+.day p {
+
+    color:#777;
+
+    font-size:1.05rem;
+
+}
+
+
+button {
+
+    background:#d97b5f;
+
+    color:white;
+
+    border:none;
+
+    padding:12px 20px;
+
+    border-radius:25px;
+
+    cursor:pointer;
+
+}
